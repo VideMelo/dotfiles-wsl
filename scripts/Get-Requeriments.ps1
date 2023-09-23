@@ -4,8 +4,6 @@ Write-Host "WARNING: This script may apply unwanted settings to your computer!" 
 Write-Host "For more information visit: https://github.com/VideMelo/dotfiles-wsl" -ForegroundColor Red
 Read-Host -Prompt "Press Enter to continue"
 
-Remove-Item .\userInfo.txt 2> $null
-
 Write-Host "Set Your Git Config:" -ForegroundColor Yellow
 $GitName = Read-Host -Prompt "Name"
 $GitEmail = Read-Host -Prompt "Email"
@@ -37,7 +35,8 @@ function Install-CoreTools {
 }
 
 function Get-Dotfiles {
-   git config --global user.name $GitName; git config --global user.email $GitEmail; echo $AuthToken | gh auth login --with-token;
+   git config --global user.name $GitName; git config --global user.email $GitEmail
+   Write-Output $AuthToken | gh auth login --with-token
    git clone https://github.com/VideMelo/dotfiles-wsl.git $DotfilesRepo
 }
 
@@ -46,7 +45,6 @@ function Set-Task {
    $trigger = New-ScheduledTaskTrigger -AtLogOn -User "$env:USERNAME"
    $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd
    $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Highest
-
    Register-ScheduledTask -TaskName "ContinueDotfilesSetup" -Action $action -Trigger $trigger -Settings $settings -Principal $principal > $null
 }
 

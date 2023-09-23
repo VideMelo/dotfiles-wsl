@@ -1,9 +1,15 @@
-echo "Starting WSL setup..."
+#!/bin/bash
+echo "Updating package lists..."
+echo $1 | sudo -S apt-get update
 
-sudo useradd -m -p $(openssl passwd -1 $1) $2
-echo $1 | sudo -u $2
+echo "Installing ZSH..."
+sudo apt-get install -y zsh
 
-cd
+echo "Installing Oh-My-Posh..."
+sudo apt-get install -y unzip
+sudo curl -s https://ohmyposh.dev/install.sh | sudo bash -s
 
-echo "Instaling ZSH..."
-sudo apt install zsh
+echo "Setting ZSH as default shell..."
+sudo chsh -s $(which zsh) $USER
+
+echo 'eval "$(oh-my-posh init zsh --config $HOME/dotfiles-wsl/files/theme.omp.json)"' >> $HOME/.zshrc

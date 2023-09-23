@@ -2,16 +2,20 @@
 
 Unregister-ScheduledTask -TaskName "ContinueDotfilesSetup" -Confirm:$false 2> $null
 
-$RepoHome = Join-Path $Home '\Source\Repos'
+$ReposPath = '\Source\Repos'
+$WinDotfilesPath = "/mnt/c/Users/$env:USERNAME/$ReposPath/dotfiles-wsl"
+
+$RepoHome = Join-Path $Home $ReposPath
 $DotfilesRepo = Join-Path $RepoHome '\dotfiles-wsl'
-# The script has not run before, so execute the first part of the script
 
 $InstallDevToolsScript = Join-Path $DotfilesRepo '\scripts\Install-DevelopmentTools.ps1'
 $PowerShellProfilePath = Join-Path $DotfilesRepo '\scripts\Set-Profile.ps1'
 $FontFilesPath = Join-Path $DotfilesRepo '\files\fonts\*.otf'
 
-Write-Host "Linux User:" -ForegroundColor Yellow
-$UserName = Read-Host -Prompt "Name"
+Write-Host "Please create a default UNIX user account." -ForegroundColor Yellow
+Write-Host "The username does not need to match your Windows username." -ForegroundColor Yellow
+Write-Host "For more information visit: https://aka.ms/wslusers"
+$UserName = Read-Host -Prompt "Enter username"
 
 do {
    $Pass = Read-Host -Prompt "Enter password" -AsSecureString
@@ -56,57 +60,47 @@ function Set-PowerShellProfile() {
 }
 
 function Set-GitConfigurations() {
+   Write-Host "Setting Git configuration..."
    git config --global core.autocrlf true
    git config --global core.editor nvim
    git config --global init.defaultBranch main
    git config --global push.autoSetupRemote true
-}
 
-function Set-Wallpaper() {
-   winget install --id=Microsoft.BingWallpaper --source=winget
+   Write-Host "Setting Git Bash profile..."
+   Copy-Item -Path $DotfilesRepo/files/.bashrc -Destination $Home/.bashrc -Force
 }
-
-# Define the path to the settings.json file here
-$SettingsJsonPath = ".\files\settings.json"
 
 function Set-WindowsTerminalSettings {
    Write-Host "Setting Windows Terminal settings..."
+   # Define the path to the Windows Terminal settings
+   $wtSettingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 
-   try {
-      # Define the path to the Windows Terminal settings
-      $wtSettingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+   # Save the settings to the Windows Terminal configuration file
+   Copy-Item -Path $RepoHome\files\settings.json -Destination $wtSettingsPath -Force
 
-      # Save the settings to the Windows Terminal configuration file
-      Copy-Item -Path $SettingsJsonPath -Destination $wtSettingsPath -Force
-
-      Write-Host "Windows Terminal settings have been applied successfully."
-   }
-   catch {
-      Write-Host "An error occurred while applying Windows Terminal settings: $_"
-   }
+   Write-Host "Windows Terminal settings have been applied successfully."
 }
 
 function Set-WSLDotfiles {
    Write-Host "Lauching WSL..."
-   Start-Job -ScriptBlock { ubuntu } > $null
-   Start-Sleep -Seconds 10
+   ubuntu install --root
 
-   wsl git clone https://github.com/VideMelo/dotfiles-wsl.git /root/dotfiles-wsl
-   wsl chmod +x /root/dotfiles-wsl/files/wsl/setup.sh
-   wsl sudo /root/dotfiles-wsl/files/wsl/setup.sh
+   Write-Host "Starting WSL setup..."
+   ubuntu run cp -r "$WinDotfilesPath" /root/dotfiles-wsl
+   ubuntu run sh /root/dotfiles-wsl/files/wsl/launch.sh "$UserPass" "$UserName"
+   ubuntu config --default-user "$UserName"
 }
 
 Write-Host "Starting initialization of dotfiles for local development on this Windows machine..."
 
 [Environment]::SetEnvironmentVariable('REPOHOME', $RepoHome, 'User')
 
-# Install-DevelopmentTools
-# Install-Fonts
+Install-DevelopmentTools
+Install-Fonts
 
-# Set-PowerShellProfile
-# Set-GitConfigurations
-# Set-Wallpaper
-# Set-WindowsTerminalSettings
+Set-PowerShellProfile
+Set-GitConfigurations
+Set-WindowsTerminalSettings
 Set-WSLDotfiles
 
 Write-Host "Complete!! Machine is ready for local Windows development."

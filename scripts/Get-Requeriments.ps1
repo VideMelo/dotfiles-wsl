@@ -1,8 +1,12 @@
 #Requires -RunAsAdministrator
 
+Write-Host "WARNING: This script may apply unwanted settings to your computer!" -ForegroundColor Red
+Write-Host "For more information visit: https://github.com/VideMelo/dotfiles-wsl" -ForegroundColor Red
+Read-Host -Prompt "Press Enter to continue"
+
 Remove-Item .\userInfo.txt 2> $null
 
-Write-Host "Git Config:" -ForegroundColor Yellow
+Write-Host "Set Your Git Config:" -ForegroundColor Yellow
 $GitName = Read-Host -Prompt "Name"
 $GitEmail = Read-Host -Prompt "Email"
 

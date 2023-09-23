@@ -1,5 +1,6 @@
 # Oh My Posh
-oh-my-posh init pwsh --config "$env:REPOHOME\dotfiles-wsl\files\theme.omp.json" | Invoke-Expression
+Copy-Item -Path $env:REPOHOME\dotfiles-wsl\files\profile-theme.omp.json -Destination $env:POSH_THEMES_PATH\profile-theme.omp.json -Force
+oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\profile-theme.omp.json" | Invoke-Expression
 
 # Git - These functions allow for management of all Git Repositories
 function Initialize-AllRepositories() {

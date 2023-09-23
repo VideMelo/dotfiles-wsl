@@ -1,6 +1,6 @@
 #Requires -RunAsAdministrator
 
-$RefreshEnv = Invoke-WebRequest -Uri “https://raw.githubusercontent.com/VideMelo/dotfiles-wsl/main/files/Refresh-Env.ps1” -UseBasicParsing | Select-Object -ExpandProperty Content
+$RefreshEnv = Invoke-WebRequest -Uri "https://raw.githubusercontent.com/VideMelo/dotfiles-wsl/main/files/Refresh-Env.ps1" -UseBasicParsing | Select-Object -ExpandProperty Content
 
 Write-Host "WARNING: This script may apply unwanted settings to your computer!" -ForegroundColor Red
 Write-Host "For more information visit: https://github.com/VideMelo/dotfiles-wsl" -ForegroundColor Red

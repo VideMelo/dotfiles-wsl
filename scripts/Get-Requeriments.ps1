@@ -2,6 +2,7 @@
 
 Write-Host "WARNING: This script may apply unwanted settings to your computer!" -ForegroundColor Red
 Write-Host "For more information visit: https://github.com/VideMelo/dotfiles-wsl" -ForegroundColor Red
+Write-Host "Your computer may restart a few times during installation!" -ForegroundColor Yellow
 Read-Host -Prompt "Press Enter to continue"
 
 Write-Host "Set Your Git Config:" -ForegroundColor Yellow

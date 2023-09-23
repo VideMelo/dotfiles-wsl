@@ -1,6 +1,6 @@
 #Requires -RunAsAdministrator
 
-$Refresh-Env = Get-Content -Path "https://raw.githubusercontent.com/VideMelo/dotfiles-wsl/main/files/Refresh-Env.ps1"
+$RefreshEnv = Get-Content -Path "https://raw.githubusercontent.com/VideMelo/dotfiles-wsl/main/files/Refresh-Env.ps1"
 
 Write-Host "WARNING: This script may apply unwanted settings to your computer!" -ForegroundColor Red
 Write-Host "For more information visit: https://github.com/VideMelo/dotfiles-wsl" -ForegroundColor Red
@@ -36,7 +36,7 @@ function Install-CoreTools {
    winget install --id=Git.Git $arguments
    winget install --id=GitHub.cli $arguments
 
-   Invoke-Expression $Refresh-Env
+   Invoke-Expression $RefreshEnv
 }
 
 function Get-Dotfiles {

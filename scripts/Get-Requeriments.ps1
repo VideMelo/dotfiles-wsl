@@ -26,8 +26,6 @@ function Install-WSL {
    dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
    dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
 
-   wsl --set-default-version 2
-
    winget install --id=9PDXGNCFSCZV --source=msstore --accept-source-agreements --accept-package-agreements
 }
 

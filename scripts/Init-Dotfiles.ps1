@@ -2,8 +2,10 @@
 
 Unregister-ScheduledTask -TaskName "ContinueDotfilesSetup" -Confirm:$false 2> $null
 
-$ReposPath = '\Source\Repos'
-$WinDotfilesPath = "/mnt/c/Users/$env:USERNAME/$ReposPath/dotfiles-wsl"
+$RefreshEnv = Invoke-WebRequest -Uri "https://raw.githubusercontent.com/VideMelo/dotfiles-wsl/main/files/Refresh-Env.ps1" -UseBasicParsing | Select-Object -ExpandProperty Content
+
+$ReposPath = '/Source/Repos'
+$WinDotfilesPath = "/mnt/c/Users/$env:USERNAME$ReposPath/dotfiles-wsl"
 
 $RepoHome = Join-Path $Home $ReposPath
 $DotfilesRepo = Join-Path $RepoHome '\dotfiles-wsl'
@@ -35,6 +37,7 @@ do {
 
 function Install-DevelopmentTools() {
    pwsh.exe $InstallDevToolsScript
+   Invoke-Expression $RefreshEnv
 }
 
 function Install-Fonts() {
@@ -76,18 +79,21 @@ function Set-WindowsTerminalSettings {
    $wtSettingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 
    # Save the settings to the Windows Terminal configuration file
-   Copy-Item -Path $RepoHome\files\settings.json -Destination $wtSettingsPath -Force
+   Copy-Item -Path $DotfilesRepo\files\settings.json -Destination $wtSettingsPath -Force
 
    Write-Host "Windows Terminal settings have been applied successfully."
 }
 
 function Set-WSLDotfiles {
    Write-Host "Lauching WSL..."
+   wsl --set-default-version 2
+   wsl --update
    ubuntu install --root
 
    Write-Host "Starting WSL setup..."
-   ubuntu run cp -r "$WinDotfilesPath" /root/dotfiles-wsl
-   ubuntu run sh /root/dotfiles-wsl/files/wsl/launch.sh "$UserPass" "$UserName"
+   ubuntu run git clone clone https://github.com/VideMelo/dotfiles-wsl.git "$WinDotfilesPath"
+   ubuntu chmod +x /root/dotfiles-wsl/files/wsl/launch.sh
+   ubuntu run /root/dotfiles-wsl/files/wsl/launch.sh "$UserPass" "$UserName"
    ubuntu config --default-user "$UserName"
 }
 

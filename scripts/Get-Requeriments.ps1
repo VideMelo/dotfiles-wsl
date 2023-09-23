@@ -51,8 +51,8 @@ function Set-Task {
 
 Write-Host "Start getting all requeriments..."
 
-Get-Dotfiles
 Install-CoreTools
+Get-Dotfiles
 Install-WSL
 Set-Task
 

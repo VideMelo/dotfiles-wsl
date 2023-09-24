@@ -2,16 +2,16 @@
 
 Unregister-ScheduledTask -TaskName "ContinueDotfilesSetup" -Confirm:$false 2> $null
 
-Import-Module .\Refresh-Env.psm1
+if (-not [System.Environment]::GetEnvironmentVariable("DOTFILESDIR")) {
+    $Dotfiles = Split-Path $PSScriptRoot -Parent
+    [Environment]::SetEnvironmentVariable('DOTFILESDIR', $Dotfiles, 'User')
+} 
 
-$ReposPath = '/Source/Repos'
+. $env:DOTFILESDIR\scripts\Refresh-Env.ps1
 
-$RepoHome = Join-Path $Home $ReposPath
-$DotfilesRepo = Join-Path $RepoHome '\dotfiles-wsl'
-
-$InstallDevToolsScript = Join-Path $DotfilesRepo '\scripts\Install-DevelopmentTools.ps1'
-$PowerShellProfilePath = Join-Path $DotfilesRepo '\files\profile.ps1'
-$FontFilesPath = Join-Path $DotfilesRepo '\files\fonts\*.otf'
+$InstallDevToolsScript = Join-Path $env:DOTFILESDIR '\scripts\Install-DevelopmentTools.ps1'
+$PowerShellProfilePath = Join-Path $env:DOTFILESDIR '\files\profile.ps1'
+$FontFilesPath = Join-Path $env:DOTFILESDIR '\files\fonts\*.otf'
 
 function Get-UnixUser {
    Write-Host "Please create a default UNIX user account." -ForegroundColor Yellow
@@ -69,6 +69,7 @@ function Install-Fonts() {
 
 function Set-PowerShellProfile() {
    Write-Host "Setting PowerShell profile..."
+   Copy-Item -Path $env:DOTFILESDIR\files\profile-theme.omp.json -Destination $env:POSH_THEMES_PATH\profile-theme.omp.json -Force
    if (!(Test-Path -Path $PROFILE.CurrentUserAllHosts)) {
       New-Item -ItemType File -Path $PROFILE.CurrentUserAllHosts -Force
    }
@@ -85,7 +86,7 @@ function Set-GitConfigurations() {
    git config --global push.autoSetupRemote true
    
    Write-Host "Setting Git Bash profile..."
-   Copy-Item -Path $DotfilesRepo/files/.bashrc -Destination $Home/.bashrc -Force
+   Copy-Item -Path $env:DOTFILESDIR/files/.bashrc -Destination $Home/.bashrc -Force
 }
 
 function Set-WindowsTerminalSettings {
@@ -94,7 +95,7 @@ function Set-WindowsTerminalSettings {
    $wtSettingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
    
    # Save the settings to the Windows Terminal configuration file
-   Copy-Item -Path $DotfilesRepo\files\settings.json -Destination $wtSettingsPath -Force
+   Copy-Item -Path $env:DOTFILESDIR\files\settings.json -Destination $wtSettingsPath -Force
    
    Write-Host "Windows Terminal settings have been applied successfully."
 }
@@ -115,9 +116,6 @@ function Set-WSLDotfiles {
 Get-UnixUser
 
 Write-Host "Starting initialization of dotfiles for local development on this Windows machine..."
-
-[Environment]::SetEnvironmentVariable('REPOHOME', $RepoHome, 'User')
-[Environment]::SetEnvironmentVariable('DOTFILESREPO', $DotfilesRepo, 'User')
 
 Install-DevelopmentTools
 Install-Fonts

@@ -1,19 +1,5 @@
 # Oh My Posh
-Copy-Item -Path $env:DOTFILESREPO\files\profile-theme.omp.json -Destination $env:POSH_THEMES_PATH\profile-theme.omp.json -Force
 oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\profile-theme.omp.json" | Invoke-Expression
-
-# Git - These functions allow for management of all Git Repositories
-function Initialize-AllRepositories() {
-  $RepositoryDirectories = Get-AllRepositories
-  
-  foreach ($Repo in $RepositoryDirectories) {
-    git init $Repo.FullName
-  }
-}
-  
-function Get-AllRepositories() {
-  return (Get-ChildItem $env:REPOHOME -Attributes Directory+Hidden -ErrorAction SilentlyContinue -Filter ".\.git" -Recurse).Parent
-}
   
 # Docker - These functions include general Docker commands that might be useful
 function Clear-Docker { docker image prune -a --filter "until=12h"; docker system prune }

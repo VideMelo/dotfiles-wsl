@@ -1,7 +1,5 @@
 #Requires -RunAsAdministrator
 
-Import-Module .\Refresh-Env.psm1
-
 Write-Host "WARNING: This script may apply unwanted settings to your computer!" -ForegroundColor Red
 Write-Host "For more information visit: https://github.com/VideMelo/dotfiles-wsl" -ForegroundColor Red
 Write-Host "Your computer may restart a few times during installation!" -ForegroundColor Yellow
@@ -15,10 +13,12 @@ Write-Host "GitHub Auth (https://github.com/settings/tokens/new)" -ForegroundCol
 Write-Host "Warining! Token with all scopes!" -ForegroundColor Yellow
 $AuthToken = Read-Host -Prompt "Token"
 
-New-Item "$Home\Source\Repos\dotfiles-wsl" -Force -ItemType Directory > $null
+if (-not [System.Environment]::GetEnvironmentVariable("DOTFILESDIR")) {
+    $Dotfiles = Split-Path $PSScriptRoot -Parent
+    [Environment]::SetEnvironmentVariable('DOTFILESDIR', $Dotfiles, 'User')
+} 
 
-$RepoHome = Join-Path $Home '\Source\Repos'
-$DotfilesRepo = Join-Path $RepoHome '\dotfiles-wsl'
+. $env:DOTFILESDIR\scripts\Refresh-Env.ps1
 
 $arguments = "--silent", "--accept-package-agreements", '--accept-source-agreements'
 
@@ -40,11 +40,11 @@ function Install-CoreTools {
 function Get-Dotfiles {
    git config --global user.name $GitName; git config --global user.email $GitEmail
    Write-Output $AuthToken | gh auth login --with-token
-   git clone https://github.com/VideMelo/dotfiles-wsl.git $DotfilesRepo
+   git clone https://github.com/VideMelo/dotfiles-wsl.git $env:DOTFILESDIR
 }
 
 function Set-Task {
-   $action = New-ScheduledTaskAction -Execute powershell.exe -Argument "wt pwsh -File $DotfilesRepo\scripts\Init-Dotfiles.ps1"
+   $action = New-ScheduledTaskAction -Execute powershell.exe -Argument "wt pwsh -File $env:DOTFILESDIR\scripts\Init-Dotfiles.ps1"
    $trigger = New-ScheduledTaskTrigger -AtLogOn -User "$env:USERNAME"
    $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd
    $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Highest

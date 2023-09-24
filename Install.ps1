@@ -1,10 +1,10 @@
 $zipfile = "$Home\dotfiles-wsl.zip"
-$destination = "$Home\Source\Repo\dotfiles-wsl"
+$destination = "$Home\Source\Repos\dotfiles-wsl"
 
 Write-Host "Installing dotfiles..."
 Invoke-WebRequest -Uri https://github.com/VideMelo/dotfiles-wsl/archive/refs/heads/main.zip -OutFile $zipfile
 
-New-Item "$Home\Source\Repo\dotfiles-wsl" -Force -ItemType Directory > $null
+New-Item $destination -Force -ItemType Directory > $null
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 [System.IO.Compression.ZipFile]::ExtractToDirectory($zipfile, $destination)
 $dir = Get-ChildItem -Path $destination | Where-Object { $_.PSIsContainer } | Select-Object -First 1

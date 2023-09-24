@@ -1,11 +1,3 @@
-
-# description: refrenv = refresh environment. for powershell
-# https://github.com/badrelmers/RefrEnv
-# usage: . .\refrenv.ps1
-
-# based on Chocolatey powershell refreshenv 
-##################################################################
-
 # Copyright © 2017 - 2021 Chocolatey Software, Inc.
 # Copyright © 2015 - 2017 RealDimensions Software, LLC
 # Copyright © 2011 - 2015 RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
@@ -156,19 +148,19 @@ param(
 
   try {
     #Write-Verbose "Getting environment variable $Name"
-    if ($win32RegistryKey -ne $null) {
+    if ($null -ne $win32RegistryKey) {
       # Some versions of Windows do not have HKCU:\Environment
       $environmentVariableValue = $win32RegistryKey.GetValue($Name, [string]::Empty, $registryValueOptions)
     }
   } catch {
     Write-Debug "Unable to retrieve the $Name environment variable. Details: $_"
   } finally {
-    if ($win32RegistryKey -ne $null) {
+    if ($null -ne $win32RegistryKey) {
       $win32RegistryKey.Close()
     }
   }
 
-  if ($environmentVariableValue -eq $null -or $environmentVariableValue -eq '') {
+  if ($null -eq $environmentVariableValue -or $environmentVariableValue -eq '') {
     $environmentVariableValue = [Environment]::GetEnvironmentVariable($Name, $Scope)
   }
 
@@ -289,9 +281,3 @@ if (-not ($userName -contains 'SYSTEM' -or $userName -contains "${env:COMPUTERNA
     Write-Output 'Finished'
   }
 }
-
-# Set-Alias refreshenv Update-SessionEnvironment
-
-echo 'RefrEnv - Refresh the Environment for powershell/pwsh'
-
-Update-SessionEnvironment

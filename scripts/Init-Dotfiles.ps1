@@ -2,15 +2,15 @@
 
 Unregister-ScheduledTask -TaskName "ContinueDotfilesSetup" -Confirm:$false 2> $null
 
-$RefreshEnv = Invoke-WebRequest -Uri "https://raw.githubusercontent.com/VideMelo/dotfiles-wsl/main/files/Refresh-Env.ps1" -UseBasicParsing | Select-Object -ExpandProperty Content
+Import-Module .\Refresh-Env.psm1
 
 $ReposPath = '/Source/Repos'
 
 $RepoHome = Join-Path $Home $ReposPath
-$DotfilesRepo = Join-Path $RepoHome '\dotfiles-wsl'
+$DotfilesRepo = Join-Path $Home '\dotfiles-wsl'
 
 $InstallDevToolsScript = Join-Path $DotfilesRepo '\scripts\Install-DevelopmentTools.ps1'
-$PowerShellProfilePath = Join-Path $DotfilesRepo '\scripts\Set-Profile.ps1'
+$PowerShellProfilePath = Join-Path $DotfilesRepo '\files\profile.ps1'
 $FontFilesPath = Join-Path $DotfilesRepo '\files\fonts\*.otf'
 
 function Get-UnixUser {
@@ -52,7 +52,7 @@ function Get-UnixUser {
 
 function Install-DevelopmentTools() {
    pwsh.exe $InstallDevToolsScript
-   Invoke-Expression $RefreshEnv
+   Update-SessionEnvironment
 }
 
 function Install-Fonts() {
@@ -117,13 +117,14 @@ Get-UnixUser
 Write-Host "Starting initialization of dotfiles for local development on this Windows machine..."
 
 [Environment]::SetEnvironmentVariable('REPOHOME', $RepoHome, 'User')
+[Environment]::SetEnvironmentVariable('DOTFILESREPO', $DotfilesRepo, 'User')
 
 Install-DevelopmentTools
 Install-Fonts
 
 Set-PowerShellProfile
 Set-GitConfigurations
-Set-WindowsTerminalSettings
 Set-WSLDotfiles
+Set-WindowsTerminalSettings
 
 Write-Host "Complete!! Machine is ready for local Windows development."

@@ -13,10 +13,9 @@ Write-Host "GitHub Auth (https://github.com/settings/tokens/new)" -ForegroundCol
 Write-Host "Warining! Token with all scopes!" -ForegroundColor Yellow
 $AuthToken = Read-Host -Prompt "Token"
 
-if (-not [System.Environment]::GetEnvironmentVariable("DOTFILESDIR")) {
-    $Dotfiles = Split-Path $PSScriptRoot -Parent
-    [Environment]::SetEnvironmentVariable('DOTFILESDIR', $Dotfiles, 'User')
-} 
+$Dotfiles = Split-Path $PSScriptRoot -Parent
+[Environment]::SetEnvironmentVariable('DOTFILESDIR', $Dotfiles, 'User')
+
 
 . $env:DOTFILESDIR\scripts\Refresh-Env.ps1
 

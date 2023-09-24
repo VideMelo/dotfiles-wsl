@@ -21,7 +21,12 @@ Run this in **Powershell** as **administrator** and follow the requested instruc
 ```pwsh
 Set-ExecutionPolicy Unrestricted; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/VideMelo/dotfiles-wsl/main/Install.ps1'))
 ```
-> **Attention**, your computer may restart a few times during installation!
+
+The default installation directory is `$env:APPDATA`, you can change it by passing a path to the installation as an argument: `-ArgumentList $HOME/Source`. Remembering to specify a literal path. (no `./dir` or `../dir`)
+
+```pwsh
+Set-ExecutionPolicy Unrestricted; Invoke-Command -ScriptBlock ([ScriptBlock]::Create((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/VideMelo/dotfiles-wsl/main/Install.ps1'))) -ArgumentList $HOME/Source
+```
 
 ## Customization
 

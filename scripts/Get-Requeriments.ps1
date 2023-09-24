@@ -20,19 +20,19 @@ New-Item "$Home\Source\Repos\dotfiles-wsl" -Force -ItemType Directory > $null
 $RepoHome = Join-Path $Home '\Source\Repos'
 $DotfilesRepo = Join-Path $RepoHome '\dotfiles-wsl'
 
-$arguments = "--source=winget", "--silent", "--accept-package-agreements", '--accept-source-agreements'
+$arguments = "--silent", "--accept-package-agreements", '--accept-source-agreements'
 
 function Install-WSL {
    dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
    dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
 
-   winget install --id=9PDXGNCFSCZV --source=msstore --accept-source-agreements --accept-package-agreements
+   winget install --id=9PDXGNCFSCZV --source=msstore $arguments # Ubunut Latest
 }
 
 function Install-CoreTools {
-   winget install --id=Microsoft.PowerShell $arguments
-   winget install --id=Git.Git $arguments
-   winget install --id=GitHub.cli $arguments
+   winget install --id=Microsoft.PowerShell --source=winget $arguments
+   winget install --id=Git.Git --source=winget $arguments
+   winget install --id=GitHub.cli --source=winget $arguments
 
    Invoke-Expression $RefreshEnv
 }

@@ -12,4 +12,4 @@ sudo curl -s https://ohmyposh.dev/install.sh | sudo bash -s
 echo "Setting ZSH as default shell..."
 sudo chsh -s $(which zsh) $USER
 
-echo 'eval "$(oh-my-posh init zsh --config $HOME/dotfiles-wsl/files/theme.omp.json)"' >> $HOME/.zshrc
+echo 'eval "$(oh-my-posh init zsh --config $HOME/dotfiles-wsl/files/profile-theme.omp.json)"' >> $HOME/.zshrc

@@ -1,37 +1,36 @@
 #Requires -RunAsAdministrator
 
-$arguments = "--source=winget", "--silent", "--accept-package-agreements", '--accept-source-agreements'
+$arguments = "--silent", "--accept-package-agreements", '--accept-source-agreements'
 
 function Install-PowerUserTools() {
-   winget install --id=Microsoft.WindowsTerminal $arguments
-   winget install --id=Microsoft.PowerShell $arguments
-   winget install --id=JanDeDobbeleer.OhMyPosh $arguments
-   winget install --id=Microsoft.PowerToys $arguments
+   winget install --id=Microsoft.WindowsTerminal --source=winget $arguments
+   winget install --id=Microsoft.PowerShell --source=winget $arguments
+   winget install --id=JanDeDobbeleer.OhMyPosh --source=winget $arguments
+   winget install --id=Microsoft.PowerToys --source=winget $arguments
 }
 
 function Install-CoreWebTools() {
-   winget install --id=OpenJS.Nodejs $arguments
-   winget install --id=Postman.Postman $arguments
+   winget install --id=OpenJS.Nodejs --source=winget $arguments
+   winget install --id=Postman.Postman --source=winget $arguments
 }
 
 function Install-PythonTools() {
-   winget install --id=Python.Python $arguments
-   winget install --id=Python.Pip $arguments
+   winget install --id=9NRWMJP3717K --source=winget $arguments # Python 3.11 and Pip
 }
 
 function Install-CoreDotNetTools() {
    winget install --id=Microsoft.DotNet.SDK.7
-   winget install --id=Microsoft.VisualStudioCode $arguments
-   winget install --id=Microsoft.VisualStudio.2022.Community $arguments
-   winget install --id=Microsoft.NuGet $arguments
-   winget install --id=Docker.DockerDesktop $arguments
+   winget install --id=Microsoft.VisualStudioCode --source=winget $arguments
+   winget install --id=Microsoft.VisualStudio.2022.Community --source=winget $arguments
+   winget install --id=Microsoft.NuGet --source=winget $arguments
+   winget install --id=Docker.DockerDesktop --source=winget $arguments
 }
 
 function Install-SocialTools() {
-   winget install --id=Discord.Discord $arguments
-   winget install --id=Spotify.Spotify $arguments
-   winget install --id=Telegram.TelegramDesktop  $arguments
-   winget install --id=WhatsApp.WhatsApp $arguments
+   winget install --id=Discord.Discord --source=winget $arguments
+   winget install --id=Spotify.Spotify --source=winget $arguments
+   winget install --id=Telegram.TelegramDesktop  --source=winget $arguments
+   winget install --id=WhatsApp.WhatsApp --source=winget $arguments
 }
 
 Write-Host "Installing local development tools..."

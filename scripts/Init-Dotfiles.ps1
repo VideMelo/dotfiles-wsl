@@ -7,7 +7,7 @@ Import-Module .\Refresh-Env.psm1
 $ReposPath = '/Source/Repos'
 
 $RepoHome = Join-Path $Home $ReposPath
-$DotfilesRepo = Join-Path $Home '\dotfiles-wsl'
+$DotfilesRepo = Join-Path $RepoHome '\dotfiles-wsl'
 
 $InstallDevToolsScript = Join-Path $DotfilesRepo '\scripts\Install-DevelopmentTools.ps1'
 $PowerShellProfilePath = Join-Path $DotfilesRepo '\files\profile.ps1'

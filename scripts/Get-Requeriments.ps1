@@ -1,6 +1,6 @@
 #Requires -RunAsAdministrator
 
-$RefreshEnv = Invoke-WebRequest -Uri "https://raw.githubusercontent.com/VideMelo/dotfiles-wsl/main/files/Refresh-Env.ps1" -UseBasicParsing | Select-Object -ExpandProperty Content
+Import-Module .\Refresh-Env.psm1
 
 Write-Host "WARNING: This script may apply unwanted settings to your computer!" -ForegroundColor Red
 Write-Host "For more information visit: https://github.com/VideMelo/dotfiles-wsl" -ForegroundColor Red
@@ -34,7 +34,7 @@ function Install-CoreTools {
    winget install --id=Git.Git --source=winget $arguments
    winget install --id=GitHub.cli --source=winget $arguments
 
-   Invoke-Expression $RefreshEnv
+   Update-SessionEnvironment
 }
 
 function Get-Dotfiles {

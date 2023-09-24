@@ -19,8 +19,7 @@ To successfully set up your development environment, make sure you have the foll
 Run this in **Powershell** as **administrator** and follow the requested instructions:
 
 ```pwsh
-Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/VideMelo/dotfiles-wsl/main/scripts/Get-Requeriments.ps1'))
-
+Set-ExecutionPolicy Unrestricted; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/VideMelo/dotfiles-wsl/main/scripts/Get-Requeriments.ps1'))
 ```
 > **Attention**, your computer may restart a few times during installation!
 

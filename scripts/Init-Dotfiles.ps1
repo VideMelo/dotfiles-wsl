@@ -12,15 +12,30 @@ $DotfilesRepo = Join-Path $RepoHome '\dotfiles-wsl'
 $InstallDevToolsScript = Join-Path $DotfilesRepo '\scripts\Install-DevelopmentTools.ps1'
 $PowerShellProfilePath = Join-Path $DotfilesRepo '\scripts\Set-Profile.ps1'
 $FontFilesPath = Join-Path $DotfilesRepo '\files\fonts\*.otf'
+
 function Get-UnixUser {
    Write-Host "Please create a default UNIX user account." -ForegroundColor Yellow
    Write-Host "The username does not need to match your Windows username." -ForegroundColor Yellow
    Write-Host "For more information visit: https://aka.ms/wslusers"
-   $Global:UserName = Read-Host -Prompt "Enter username"
 
    do {
-      $Pass = Read-Host -Prompt "Enter password" -AsSecureString
-      $RePass = Read-Host -Prompt "Enter password again" -AsSecureString
+      $Global:UserName = Read-Host -Prompt "Enter username"
+      if ([string]::IsNullOrWhiteSpace($Global:UserName)) {
+         Write-Host "Username cannot be empty. Please try again."
+      }
+   } while ([string]::IsNullOrWhiteSpace($Global:UserName))
+
+   do {
+      do {
+         $Pass = Read-Host -Prompt "Enter password" -AsSecureString
+         $RePass = Read-Host -Prompt "Enter password again" -AsSecureString
+
+         if ([string]::IsNullOrWhiteSpace([System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Pass))) -or
+            [string]::IsNullOrWhiteSpace([System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($RePass)))) {
+            Write-Host "Password cannot be empty. Please try again."
+         }
+      } while ([string]::IsNullOrWhiteSpace([System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Pass))) -or
+         [string]::IsNullOrWhiteSpace([System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($RePass))))
 
       # Convert SecureString to plain text for comparison
       $BSTR1 = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Pass)
@@ -34,7 +49,6 @@ function Get-UnixUser {
       $Global:UserPass = $PassText
    } while ($PassText -ne $RePassText)
 }
-
 
 function Install-DevelopmentTools() {
    pwsh.exe $InstallDevToolsScript

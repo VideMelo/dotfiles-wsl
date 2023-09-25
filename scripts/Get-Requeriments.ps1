@@ -60,13 +60,15 @@ function Install-Package {
 }
 
 function Install-WSL {
+   Write-Host "Instaling WSL..."
    dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart | Out-Null
    dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart | Out-Null
    
-   Install-Package -Id 9PDXGNCFSCZV -Source msstore -Name ubuntu
+   Install-Package -Id 9PDXGNCFSCZV -Source msstore -Name Ubuntu
 }
 
 function Install-CoreTools {
+   Write-Host "Instaling core tools..."
    Install-Package -Id Microsoft.PowerShell -Name "Powershell 7"
    Install-Package -Id Git.Git -Name "Git"
    Install-Package -Id GitHub.cli -Name "GitHun CLI"
@@ -75,6 +77,7 @@ function Install-CoreTools {
 }
 
 function Set-GitConfig {
+   Write-Host "Setting git config..."
    git config --global user.name $GitName; git config --global user.email $GitEmail
    Write-Output $AuthToken | gh auth login --with-Token
 }

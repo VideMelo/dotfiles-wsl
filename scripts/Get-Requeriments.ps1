@@ -74,9 +74,9 @@ function Install-CoreTools {
    Update-SessionEnvironment
 }
 
-function Set-Git {
+function Set-GitConfig {
    git config --global user.name $GitName; git config --global user.email $GitEmail
-   git clone https://github.com/VideMelo/dotfiles-wsl.git $Dotfiles
+   Write-Output $AuthToken | gh auth login --with-Token
 }
 
 function Set-Task {
@@ -91,7 +91,7 @@ function Set-Task {
 Write-Host "Start getting all requeriments..."
 
 Install-CoreTools
-Set-Git
+Set-GitConfig
 Install-WSL
 Set-Task
 

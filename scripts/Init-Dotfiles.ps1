@@ -1,21 +1,48 @@
+<#
+.SYNOPSIS
+    Configure a Windows machine for local development using dotfiles.
+
+.DESCRIPTION
+    This script configures a Windows machine for local development using dotfiles. It performs various tasks
+    including setting environment variables, installing development tools, configuring PowerShell profiles, 
+    installing fonts, and configuring Git settings.
+
+.NOTES
+    You can find more information about dotfiles and their usage at https://github.com/VideMelo/dotfiles-wsl.
+
+    This script should be run with Administrator privileges.
+
+    To set up your dotfiles for local development, follow the prompts and instructions provided during the script execution.
+
+#>
+
+# Requires Administrator privileges to run.
 #Requires -RunAsAdministrator
 
-Unregister-ScheduledTask -TaskName "ContinueDotfilesSetup" -Confirm:$false 2> $null
+# Unregister a scheduled task named "ContinueDotfilesSetup" silently.
+Unregister-ScheduledTask -TaskName "ContinueDotfilesSetup" -Confirm:$false | Out-Null
 
+# Get the parent directory of the current script.
 $Dotfiles = Split-Path $PSScriptRoot -Parent
+
+# Set the environment variable 'DOTFILESDIR' to the dotfiles directory.
 [Environment]::SetEnvironmentVariable('DOTFILESDIR', $Dotfiles, 'User')
 
-. $env:DOTFILESDIR\scripts\Refresh-Env.ps1
+# Source the 'RefreshEnv.ps1' script to update environment variables.
+. $env:DOTFILESDIR\scripts\RefreshEnv.ps1
 
+# Define paths and functions for subsequent tasks.
 $InstallDevToolsScript = Join-Path $env:DOTFILESDIR '\scripts\Install-DevelopmentTools.ps1'
 $PowerShellProfilePath = Join-Path $env:DOTFILESDIR '\files\profile.ps1'
 $FontFilesPath = Join-Path $env:DOTFILESDIR '\files\fonts\*.otf'
 
+# Function to create a UNIX user account for WSL.
 function Get-UnixUser {
    Write-Host "Please create a default UNIX user account." -ForegroundColor Yellow
    Write-Host "The username does not need to match your Windows username." -ForegroundColor Yellow
    Write-Host "For more information visit: https://aka.ms/wslusers"
 
+   # Validate and store the provided username and password.
    do {
       $Global:UserName = Read-Host -Prompt "Enter username"
       if ([string]::IsNullOrWhiteSpace($Global:UserName)) {
@@ -49,7 +76,7 @@ function Get-UnixUser {
 }
 
 function Install-DevelopmentTools() {
-   pwsh.exe $InstallDevToolsScript
+   . $InstallDevToolsScript
    Update-SessionEnvironment
 }
 
@@ -67,7 +94,10 @@ function Install-Fonts() {
 
 function Set-PowerShellProfile() {
    Write-Host "Setting PowerShell profile..."
+
    Copy-Item -Path $env:DOTFILESDIR\files\profile-theme.omp.json -Destination $env:POSH_THEMES_PATH\profile-theme.omp.json -Force
+
+   # Create or update the PowerShell user profile.
    if (!(Test-Path -Path $PROFILE.CurrentUserAllHosts)) {
       New-Item -ItemType File -Path $PROFILE.CurrentUserAllHosts -Force
    }
@@ -123,4 +153,4 @@ Set-GitConfigurations
 Set-WSLDotfiles
 Set-WindowsTerminalSettings
 
-Write-Host "Complete!! Machine is ready for local Windows development."
+Write-Host "Complete!! Machine is ready for local Windows development." -ForegroundColor Blue

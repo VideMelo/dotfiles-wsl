@@ -16,35 +16,35 @@
 
 function Get-EnvironmentVariableNames([System.EnvironmentVariableTarget] $Scope) {
 <#
-.SYNOPSIS
-Gets all environment variable names.
+  .SYNOPSIS
+    Gets all environment variable names.
 
-.DESCRIPTION
-Provides a list of environment variable names based on the scope. This
-can be used to loop through the list and generate names.
+  .DESCRIPTION
+    Provides a list of environment variable names based on the scope. This
+    can be used to loop through the list and generate names.
 
-.NOTES
-Process dumps the current environment variable names in memory /
-session. The other scopes refer to the registry values.
+  .NOTES
+    Process dumps the current environment variable names in memory /
+    session. The other scopes refer to the registry values.
 
-.INPUTS
-None
+  .INPUTS
+    None
 
-.OUTPUTS
-A list of environment variables names.
+  .OUTPUTS
+    A list of environment variables names.
 
-.PARAMETER Scope
-The environment variable target scope. This is `Process`, `User`, or
-`Machine`.
+  .PARAMETER Scope
+    The environment variable target scope. This is `Process`, `User`, or
+    `Machine`.
 
-.EXAMPLE
-Get-EnvironmentVariableNames -Scope Machine
+  .EXAMPLE
+    Get-EnvironmentVariableNames -Scope Machine
 
-.LINK
-Get-EnvironmentVariable
+  .LINK
+  Get-EnvironmentVariable
 
-.LINK
-Set-EnvironmentVariable
+  .LINK
+    Set-EnvironmentVariable
 #>
 
   # Do not log function call
@@ -76,54 +76,54 @@ Set-EnvironmentVariable
 # limitations under the License.
 
 function Get-EnvironmentVariable {
-<#
-.SYNOPSIS
-Gets an Environment Variable.
+  <#
+  .SYNOPSIS
+    Gets an Environment Variable.
 
-.DESCRIPTION
-This will will get an environment variable based on the variable name
-and scope while accounting whether to expand the variable or not
-(e.g.: `%TEMP%`-> `C:\User\Username\AppData\Local\Temp`).
+  .DESCRIPTION
+    This will will get an environment variable based on the variable name
+    and scope while accounting whether to expand the variable or not
+    (e.g.: `%TEMP%`-> `C:\User\Username\AppData\Local\Temp`).
 
-.NOTES
-This helper reduces the number of lines one would have to write to get
-environment variables, mainly when not expanding the variables is a
-must.
+  .NOTES
+    This helper reduces the number of lines one would have to write to get
+    environment variables, mainly when not expanding the variables is a
+    must.
 
-.PARAMETER Name
-The environment variable you want to get the value from.
+  .PARAMETER Name
+    The environment variable you want to get the value from.
 
-.PARAMETER Scope
-The environment variable target scope. This is `Process`, `User`, or
-`Machine`.
+  .PARAMETER Scope
+    The environment variable target scope. This is `Process`, `User`, or
+    `Machine`.
 
-.PARAMETER PreserveVariables
-A switch parameter stating whether you want to expand the variables or
-not. Defaults to false. Available in 0.9.10+.
+  .PARAMETER PreserveVariables
+    A switch parameter stating whether you want to expand the variables or
+    not. Defaults to false. Available in 0.9.10+.
 
-.PARAMETER IgnoredArguments
-Allows splatting with arguments that do not apply. Do not use directly.
+  .PARAMETER IgnoredArguments
+    Allows splatting with arguments that do not apply. Do not use directly.
 
-.EXAMPLE
-Get-EnvironmentVariable -Name 'TEMP' -Scope User -PreserveVariables
+  .EXAMPLE
+    Get-EnvironmentVariable -Name 'TEMP' -Scope User -PreserveVariables
 
-.EXAMPLE
-Get-EnvironmentVariable -Name 'PATH' -Scope Machine
+  .EXAMPLE
+    Get-EnvironmentVariable -Name 'PATH' -Scope Machine
 
-.LINK
-Get-EnvironmentVariableNames
+  .LINK
+    Get-EnvironmentVariableNames
 
-.LINK
-Set-EnvironmentVariable
+  .LINK
+    Set-EnvironmentVariable
 #>
-[CmdletBinding()]
-[OutputType([string])]
-param(
-  [Parameter(Mandatory=$true)][string] $Name,
-  [Parameter(Mandatory=$true)][System.EnvironmentVariableTarget] $Scope,
-  [Parameter(Mandatory=$false)][switch] $PreserveVariables = $false,
-  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
-)
+  [CmdletBinding()]
+  [OutputType([string])]
+  param(
+    [Parameter(Mandatory = $true)][string] $Name,
+    [Parameter(Mandatory = $true)][System.EnvironmentVariableTarget] $Scope,
+    [Parameter(Mandatory = $false)][switch] $PreserveVariables = $false,
+    [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+  )
 
   # Do not log function call, it may expose variable names
   ## Called from chocolateysetup.psm1 - wrap any Write-Host in try/catch
@@ -133,7 +133,8 @@ param(
   if ($Scope -eq [System.EnvironmentVariableTarget]::User) {
     [string] $USER_ENVIRONMENT_REGISTRY_KEY_NAME = "Environment";
     [Microsoft.Win32.RegistryKey] $win32RegistryKey = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey($USER_ENVIRONMENT_REGISTRY_KEY_NAME)
-  } elseif ($Scope -eq [System.EnvironmentVariableTarget]::Process) {
+  }
+  elseif ($Scope -eq [System.EnvironmentVariableTarget]::Process) {
     return [Environment]::GetEnvironmentVariable($Name, $Scope)
   }
 
@@ -152,9 +153,11 @@ param(
       # Some versions of Windows do not have HKCU:\Environment
       $environmentVariableValue = $win32RegistryKey.GetValue($Name, [string]::Empty, $registryValueOptions)
     }
-  } catch {
+  }
+  catch {
     Write-Debug "Unable to retrieve the $Name environment variable. Details: $_"
-  } finally {
+  }
+  finally {
     if ($null -ne $win32RegistryKey) {
       $win32RegistryKey.Close()
     }
@@ -188,39 +191,39 @@ param(
 # limitations under the License.
 
 function Update-SessionEnvironment {
-<#
-.SYNOPSIS
-Updates the environment variables of the current powershell session with
-any environment variable changes that may have occured during a
-Chocolatey package install.
+  <#
+  .SYNOPSIS
+    Updates the environment variables of the current powershell session with
+    any environment variable changes that may have occured during a
+    Chocolatey package install.
 
-.DESCRIPTION
-When Chocolatey installs a package, the package author may add or change
-certain environment variables that will affect how the application runs
-or how it is accessed. Often, these changes are not visible to the
-current PowerShell session. This means the user needs to open a new
-PowerShell session before these settings take effect which can render
-the installed application nonfunctional until that time.
+  .DESCRIPTION
+    When Chocolatey installs a package, the package author may add or change
+    certain environment variables that will affect how the application runs
+    or how it is accessed. Often, these changes are not visible to the
+    current PowerShell session. This means the user needs to open a new
+    PowerShell session before these settings take effect which can render
+    the installed application nonfunctional until that time.
 
-Use the Update-SessionEnvironment command to refresh the current
-PowerShell session with all environment settings possibly performed by
-Chocolatey package installs.
+    Use the Update-SessionEnvironment command to refresh the current
+    PowerShell session with all environment settings possibly performed by
+    Chocolatey package installs.
 
-.NOTES
-This method is also added to the user's PowerShell profile as
-`refreshenv`. When called as `refreshenv`, the method will provide
-additional output.
+  .NOTES
+    This method is also added to the user's PowerShell profile as
+    `refreshenv`. When called as `refreshenv`, the method will provide
+    additional output.
 
-Preserves `PSModulePath` as set by the process starting in 0.9.10.
+    Preserves `PSModulePath` as set by the process starting in 0.9.10.
 
-.INPUTS
-None
+  .INPUTS
+    None
 
-.OUTPUTS
-None
+  .OUTPUTS
+    None
 #>
 
-#  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+  #  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
   $refreshEnv = $false
   $invocation = $MyInvocation
@@ -230,7 +233,8 @@ None
 
   if ($refreshEnv) {
     Write-Output 'Refreshing environment variables from the registry for powershell.exe. Please wait...'
-  } else {
+  }
+  else {
     Write-Verbose 'Refreshing environment variables from the registry.'
   }
 
@@ -239,35 +243,35 @@ None
   $psModulePath = $env:PSModulePath
 
   #ordering is important here, $user should override $machine...
-#  $ScopeList = 'Process', 'Machine'
-#  if ($userName -notin ('SYSTEM', "${env:COMPUTERNAME}`$")) {
-#     but only if not running as the SYSTEM/machine in which case user can be ignored.
-#    $ScopeList += 'User'
-#  }
+  #  $ScopeList = 'Process', 'Machine'
+  #  if ($userName -notin ('SYSTEM', "${env:COMPUTERNAME}`$")) {
+  #     but only if not running as the SYSTEM/machine in which case user can be ignored.
+  #    $ScopeList += 'User'
+  #  }
 
-#powershell v2 which come preinstalled in win 7 do not have  -notin
-# the -notin operator is not available in the version of PowerShell running on Windows 7 system. The -notin operator was introduced in PowerShell 3.0
-#To work around this issue, you can use the -notcontains operator, which is available in earlier versions of PowerShell
+  #powershell v2 which come preinstalled in win 7 do not have  -notin
+  # the -notin operator is not available in the version of PowerShell running on Windows 7 system. The -notin operator was introduced in PowerShell 3.0
+  #To work around this issue, you can use the -notcontains operator, which is available in earlier versions of PowerShell
   $ScopeList = 'Process', 'Machine'
-if (-not ($userName -contains 'SYSTEM' -or $userName -contains "${env:COMPUTERNAME}`$")) {
+  if (-not ($userName -contains 'SYSTEM' -or $userName -contains "${env:COMPUTERNAME}`$")) {
     # but only if not running as the SYSTEM/machine in which case user can be ignored.
     $ScopeList += 'User'
-}
+  }
 
 
   foreach ($Scope in $ScopeList) {
     Get-EnvironmentVariableNames -Scope $Scope |
-        ForEach-Object {
-          Set-Item "Env:$_" -Value (Get-EnvironmentVariable -Scope $Scope -Name $_)
-        }
+    ForEach-Object {
+      Set-Item "Env:$_" -Value (Get-EnvironmentVariable -Scope $Scope -Name $_)
+    }
   }
 
   #Path gets special treatment b/c it munges the two together
   $paths = 'Machine', 'User' |
-    ForEach-Object {
+  ForEach-Object {
       (Get-EnvironmentVariable -Name 'PATH' -Scope $_) -split ';'
-    } |
-    Select-Object -Unique
+  } |
+  Select-Object -Unique
   $Env:PATH = $paths -join ';'
 
   # PSModulePath is almost always updated by process, so we want to preserve it.

@@ -2,35 +2,55 @@
 
 $arguments = "--silent", "--accept-package-agreements", '--accept-source-agreements'
 
+function Install-Package {
+   param (
+      [Parameter(Mandatory = $true)]
+      [string]$Id,
+      [Parameter(Mandatory = $false)]
+      [string]$Source = "winget",
+      [Parameter(Mandatory = $true)]
+      [string]$Name = "Package"
+   )
+   
+   try {
+      Write-Host "Instaling $Name..."
+      winget install --id=$Id --source=$Source --accept-source-agreements --accept-package-agreements --silent | Out-Null
+      Write-Host "Package sucessfully installed!" -ForegroundColor Blue
+   }
+   catch {
+      Write-Host "The package could not be installed!" -ForegroundColor Red
+   }
+}
+
 function Install-PowerUserTools() {
-   winget install --id=Microsoft.WindowsTerminal --source=winget $arguments
-   winget install --id=Microsoft.PowerShell --source=winget $arguments
-   winget install --id=JanDeDobbeleer.OhMyPosh --source=winget $arguments
-   winget install --id=Microsoft.PowerToys --source=winget $arguments
+   Install-Package -Id Microsoft.WindowsTerminal -Name "Windows lTerminal"
+   Install-Package -Id Microsoft.PowerShell -Name PowerShell
+   Install-Package -Id JanDeDobbeleer.OhMyPosh -Name OhMyPosh
+   Install-Package -Id Microsoft.PowerToys -Name PowerToys
 }
 
 function Install-CoreWebTools() {
-   winget install --id=OpenJS.Nodejs --source=winget $arguments
-   winget install --id=Postman.Postman --source=winget $arguments
+   Install-Package -Id OpenJS.Nodejs -Name NodeJS
+   Install-Package -Id Postman.Postman -Name Postman
 }
 
 function Install-PythonTools() {
-   winget install --id=9NRWMJP3717K --source=winget $arguments # Python 3.11 and Pip
+   Install-Package -Id 9NRWMJP3717K -Source msstore -Name Python
 }
 
 function Install-CoreDotNetTools() {
-   winget install --id=Microsoft.DotNet.SDK.7
-   winget install --id=Microsoft.VisualStudioCode --source=winget $arguments
-   winget install --id=Microsoft.VisualStudio.2022.Community --source=winget $arguments
-   winget install --id=Microsoft.NuGet --source=winget $arguments
-   winget install --id=Docker.DockerDesktop --source=winget $arguments
+   Install-Package -Id Microsoft.DotNet.SDK.7 -Name "DotNet SDK"
+   Install-Package -Id Microsoft.VisualStudioCode -Name VisualStudio
+   Install-Package -Id Microsoft.VisualStudio.2022.Community -Name "VisualStudio 2022 Community"
+   Install-Package -Id Microsoft.NuGet -Name Nuget
+   Install-Package -Id Docker.DockerDesktop -Name "Docker Desktop"
 }
 
 function Install-SocialTools() {
-   winget install --id=Discord.Discord --source=winget $arguments
-   winget install --id=Spotify.Spotify --source=winget $arguments
-   winget install --id=Telegram.TelegramDesktop  --source=winget $arguments
-   winget install --id=WhatsApp.WhatsApp --source=winget $arguments
+   Install-Package -Id Discord.Discord -Name Discord
+   Install-Package -Id Spotify.Spotify -Name Spotify
+   Install-Package -Id Telegram.TelegramDesktop -Name "Telegram Descktop"
+   Install-Package -Id WhatsApp.WhatsApp -Name "WhatsApp"
 }
 
 Write-Host "Installing local development tools..."
@@ -41,4 +61,4 @@ Install-PythonTools
 Install-CoreWebTools
 Install-SocialTools
 
-Write-Host "Complete!! Development tools installed successfully. Restarting in 5 Seconds..."
+Write-Host "Complete!! Development tools installed successfully."

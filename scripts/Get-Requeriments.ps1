@@ -1,3 +1,23 @@
+<#
+.SYNOPSIS
+    Configure a Windows machine for local development using dotfiles within Windows Subsystem for Linux (WSL).
+
+.DESCRIPTION
+    This script automates the setup of a Windows machine for local development using dotfiles in Windows Subsystem for Linux (WSL).
+    It enables required features, installs core tools, sets Git configurations, and schedules a task for continuing the setup.
+
+    WARNING: This script may apply settings that modify your computer. Make sure to read the documentation at 
+    https://github.com/VideMelo/dotfiles-wsl for more information.
+
+    Your computer may restart during installation.
+
+.NOTES
+    This script should be run with Administrator privileges.
+
+    Follow the prompts to configure Git, provide an authentication token, and continue with the installation.
+#>
+
+# Requires Administrator privileges to run.
 #Requires -RunAsAdministrator
 
 Write-Host "WARNING: This script may apply unwanted settings to your computer!" -ForegroundColor Red
@@ -13,25 +33,44 @@ Write-Host "GitHub Auth (https://github.com/settings/tokens/new)" -ForegroundCol
 Write-Host "Warining! Token with all scopes!" -ForegroundColor Yellow
 $AuthToken = Read-Host -Prompt "Token"
 
+Powercfg -change -standby-timeout-ac 0
+
 $Dotfiles = Split-Path $PSScriptRoot -Parent
 [Environment]::SetEnvironmentVariable('DOTFILESDIR', $Dotfiles, 'User')
 
+. $env:DOTFILESDIR\scripts\RefreshEnv.ps1
 
-. $env:DOTFILESDIR\scripts\Refresh-Env.ps1
-
-$arguments = "--silent", "--accept-package-agreements", '--accept-source-agreements'
+function Install-Package {
+   param (
+      [Parameter(Mandatory = $true)]
+      [string]$Id,
+      [Parameter(Mandatory = $false)]
+      [string]$Source = "winget",
+      [Parameter(Mandatory = $true)]
+      [string]$Name = "Package"
+   )
+   
+   try {
+      Write-Host "Instaling $Name..."
+      winget install --id=$Id --source=$Source --accept-source-agreements --accept-package-agreements --silent | Out-Null
+      Write-Host "Package sucessfully installed!" -ForegroundColor Blue
+   }
+   catch {
+      Write-Host "The package could not be installed!" -ForegroundColor Red
+   }
+}
 
 function Install-WSL {
-   dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
-   dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
-
-   winget install --id=9PDXGNCFSCZV --source=msstore $arguments # Ubunut Latest
+   dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart | Out-Null
+   dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart | Out-Null
+   
+   Install-Package -Id 9PDXGNCFSCZV -Source msstore -Name ubuntu
 }
 
 function Install-CoreTools {
-   winget install --id=Microsoft.PowerShell --source=winget $arguments
-   winget install --id=Git.Git --source=winget $arguments
-   winget install --id=GitHub.cli --source=winget $arguments
+   Install-Package -Id Microsoft.PowerShell -Name "Powershell 7"
+   Install-Package -Id Git.Git -Name "Git"
+   Install-Package -Id GitHub.cli -Name "GitHun CLI"
 
    Update-SessionEnvironment
 }
@@ -47,8 +86,9 @@ function Set-Task {
    $trigger = New-ScheduledTaskTrigger -AtLogOn -User "$env:USERNAME"
    $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd
    $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Highest
-   Register-ScheduledTask -TaskName "ContinueDotfilesSetup" -Action $action -Trigger $trigger -Settings $settings -Principal $principal > $null
+   Register-ScheduledTask -TaskName "ContinueDotfilesSetup" -Action $action -Trigger $trigger -Settings $settings -Principal $principal | Out-Null
 }
+
 
 Write-Host "Start getting all requeriments..."
 
@@ -56,6 +96,8 @@ Install-CoreTools
 Get-Dotfiles
 Install-WSL
 Set-Task
+
+. $env:DOTFILESDIR\scripts\Set-WindowsConfigs.ps1
 
 Write-Host "Complete!! Restarting in 5 seconds..."
 

@@ -23,7 +23,7 @@ function Install-Package {
 }
 
 function Install-PowerUserTools() {
-   Install-Package -Id Microsoft.WindowsTerminal -Name "Windows lTerminal"
+   Install-Package -Id Microsoft.WindowsTerminal -Name "Windows Terminal"
    Install-Package -Id Microsoft.PowerShell -Name PowerShell
    Install-Package -Id JanDeDobbeleer.OhMyPosh -Name OhMyPosh
    Install-Package -Id Microsoft.PowerToys -Name PowerToys
@@ -49,7 +49,7 @@ function Install-CoreDotNetTools() {
 function Install-SocialTools() {
    Install-Package -Id Discord.Discord -Name Discord
    Install-Package -Id Spotify.Spotify -Name Spotify
-   Install-Package -Id Telegram.TelegramDesktop -Name "Telegram Descktop"
+   Install-Package -Id Telegram.TelegramDesktop -Name "Telegram Desktop"
    Install-Package -Id WhatsApp.WhatsApp -Name "WhatsApp"
 }
 

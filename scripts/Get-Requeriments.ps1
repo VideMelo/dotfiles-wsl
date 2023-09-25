@@ -74,14 +74,13 @@ function Install-CoreTools {
    Update-SessionEnvironment
 }
 
-function Get-Dotfiles {
+function Set-Git {
    git config --global user.name $GitName; git config --global user.email $GitEmail
-   Write-Output $AuthToken | gh auth login --with-token
    git clone https://github.com/VideMelo/dotfiles-wsl.git $Dotfiles
 }
 
 function Set-Task {
-   $action = New-ScheduledTaskAction -Execute powershell.exe -Argument "wt pwsh -File $Dotfiles\scripts\Init-Dotfiles.ps1"
+   $action = New-ScheduledTaskAction -Execute powershell.exe -Argument "pwsh -File $Dotfiles\scripts\Init-Dotfiles.ps1"
    $trigger = New-ScheduledTaskTrigger -AtLogOn -User "$env:USERNAME"
    $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd
    $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Highest
@@ -92,7 +91,7 @@ function Set-Task {
 Write-Host "Start getting all requeriments..."
 
 Install-CoreTools
-Get-Dotfiles
+Set-Git
 Install-WSL
 Set-Task
 

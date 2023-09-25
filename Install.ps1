@@ -49,7 +49,6 @@ $dir = Get-ChildItem -Path $Destination | Where-Object { $_.PSIsContainer } | Se
 Get-ChildItem -Path $dir.FullName | Move-Item -Destination $Destination
 
 # Remove the now-empty subdirectory and the downloaded ZIP file
-Remove-Item $dir
 Remove-Item $ZipFile
 
 # Source the 'Get-Requeriments.ps1' script to continue the setup

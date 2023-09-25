@@ -36,9 +36,8 @@ $AuthToken = Read-Host -Prompt "Token"
 Powercfg -change -standby-timeout-ac 0
 
 $Dotfiles = Split-Path $PSScriptRoot -Parent
-[Environment]::SetEnvironmentVariable('DOTFILESDIR', $Dotfiles, 'User')
 
-. $env:DOTFILESDIR\scripts\RefreshEnv.ps1
+. $Dotfiles\scripts\RefreshEnv.ps1
 
 function Install-Package {
    param (
@@ -78,11 +77,11 @@ function Install-CoreTools {
 function Get-Dotfiles {
    git config --global user.name $GitName; git config --global user.email $GitEmail
    Write-Output $AuthToken | gh auth login --with-token
-   git clone https://github.com/VideMelo/dotfiles-wsl.git $env:DOTFILESDIR
+   git clone https://github.com/VideMelo/dotfiles-wsl.git $Dotfiles
 }
 
 function Set-Task {
-   $action = New-ScheduledTaskAction -Execute powershell.exe -Argument "wt pwsh -File $env:DOTFILESDIR\scripts\Init-Dotfiles.ps1"
+   $action = New-ScheduledTaskAction -Execute powershell.exe -Argument "wt pwsh -File $Dotfiles\scripts\Init-Dotfiles.ps1"
    $trigger = New-ScheduledTaskTrigger -AtLogOn -User "$env:USERNAME"
    $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -DontStopOnIdleEnd
    $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Highest
@@ -97,7 +96,7 @@ Get-Dotfiles
 Install-WSL
 Set-Task
 
-. $env:DOTFILESDIR\scripts\Set-WindowsConfigs.ps1
+. $Dotfiles\scripts\Set-WindowsConfigs.ps1
 
 Write-Host "Complete!! Restarting in 5 seconds..."
 

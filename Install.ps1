@@ -21,16 +21,13 @@ param(
 #Requires -RunAsAdministrator
 
 # Define file paths and variables
-$ZipFile = "$Home\dotfiles-wsl.zip"
+$ZipFile = "$Installdir\dotfiles-wsl.zip"
 $Destination = "$Installdir\dotfiles-wsl"
 
 # Remove existing dotfiles installation if it exists
 if (Test-Path $Destination) {
     Remove-Item -Path $Destination -Force
 }
-
-# Set the 'DOTFILESDIR' environment variable to the installation directory
-[Environment]::SetEnvironmentVariable('DOTFILESDIR', $Destination, 'User')
 
 # Display a message indicating the start of the installation process.
 Write-Host "Installing dotfiles..."

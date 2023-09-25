@@ -25,16 +25,13 @@ Unregister-ScheduledTask -TaskName "ContinueDotfilesSetup" -Confirm:$false | Out
 # Get the parent directory of the current script.
 $Dotfiles = Split-Path $PSScriptRoot -Parent
 
-# Set the environment variable 'DOTFILESDIR' to the dotfiles directory.
-[Environment]::SetEnvironmentVariable('DOTFILESDIR', $Dotfiles, 'User')
-
 # Source the 'RefreshEnv.ps1' script to update environment variables.
-. $env:DOTFILESDIR\scripts\RefreshEnv.ps1
+. $Dotfiles\scripts\RefreshEnv.ps1
 
 # Define paths and functions for subsequent tasks.
-$InstallDevToolsScript = Join-Path $env:DOTFILESDIR '\scripts\Install-DevelopmentTools.ps1'
-$PowerShellProfilePath = Join-Path $env:DOTFILESDIR '\files\profile.ps1'
-$FontFilesPath = Join-Path $env:DOTFILESDIR '\files\fonts\*.otf'
+$InstallDevToolsScript = Join-Path $Dotfiles '\scripts\Install-DevelopmentTools.ps1'
+$PowerShellProfilePath = Join-Path $Dotfiles '\files\profile.ps1'
+$FontFilesPath = Join-Path $Dotfiles '\files\fonts\*.otf'
 
 # Function to create a UNIX user account for WSL.
 function Get-UnixUser {
@@ -95,7 +92,7 @@ function Install-Fonts() {
 function Set-PowerShellProfile() {
    Write-Host "Setting PowerShell profile..."
 
-   Copy-Item -Path $env:DOTFILESDIR\files\profile-theme.omp.json -Destination $env:POSH_THEMES_PATH\profile-theme.omp.json -Force
+   Copy-Item -Path $Dotfiles\files\profile-theme.omp.json -Destination $env:POSH_THEMES_PATH\profile-theme.omp.json -Force
 
    # Create or update the PowerShell user profile.
    if (!(Test-Path -Path $PROFILE.CurrentUserAllHosts)) {
@@ -114,7 +111,7 @@ function Set-GitConfigurations() {
    git config --global push.autoSetupRemote true
    
    Write-Host "Setting Git Bash profile..."
-   Copy-Item -Path $env:DOTFILESDIR/files/.bashrc -Destination $Home/.bashrc -Force
+   Copy-Item -Path $Dotfiles/files/.bashrc -Destination $Home/.bashrc -Force
 }
 
 function Set-WindowsTerminalSettings {
@@ -123,7 +120,7 @@ function Set-WindowsTerminalSettings {
    $wtSettingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
    
    # Save the settings to the Windows Terminal configuration file
-   Copy-Item -Path $env:DOTFILESDIR\files\settings.json -Destination $wtSettingsPath -Force
+   Copy-Item -Path $Dotfiles\files\settings.json -Destination $wtSettingsPath -Force
    
    Write-Host "Windows Terminal settings have been applied successfully."
 }

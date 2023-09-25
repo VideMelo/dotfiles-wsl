@@ -2,7 +2,6 @@ function Remove-PreInstalledApps {
    Write-Host "Removing pre installed applications..."
    $BlockedAppsList =    
    "Clipchamp.Clipchamp
-                Microsoft.549981C3F5F10
                 Microsoft.GamingApp
                 Microsoft.GetHelp
                 Microsoft.Getstarted
